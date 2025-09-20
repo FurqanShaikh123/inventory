@@ -1,0 +1,9 @@
+
+> inventory-backend@1.0.0 start
+> node src/server.js
+
+Database initialized successfully
+🚀 Server running on port 3001
+📊 API available at http://localhost:3001
+🏥 Health check: http://localhost:3001/health
+Connected to SQLite database

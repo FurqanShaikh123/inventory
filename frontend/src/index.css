@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Inventory Restock Predictor Design System 
+Professional, data-driven design with clear status indicators
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Base colors - clean and professional */
+    --background: 218 23% 98%;
+    --foreground: 220 13% 18%;
+
+    /* Card system */
+    --card: 0 0% 100%;
+    --card-foreground: 220 13% 18%;
+
+    /* Popover system */
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 13% 18%;
+
+    /* Primary brand - professional teal */
+    --primary: 193 76% 40%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 193 76% 85%;
+    --primary-glow: 193 76% 60%;
+
+    /* Secondary system */
+    --secondary: 214 15% 95%;
+    --secondary-foreground: 220 13% 30%;
+
+    /* Muted tones */
+    --muted: 214 15% 95%;
+    --muted-foreground: 220 9% 55%;
+
+    /* Accent colors */
+    --accent: 214 15% 95%;
+    --accent-foreground: 220 13% 30%;
+
+    /* Status colors for inventory levels */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 71% 92%;
+    
+    --warning: 45 93% 47%;
+    --warning-foreground: 45 93% 15%;
+    --warning-light: 45 93% 90%;
+    
+    --critical: 0 84% 60%;
+    --critical-foreground: 0 0% 100%;
+    --critical-light: 0 84% 95%;
+
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Interface elements */
+    --border: 214 20% 88%;
+    --input: 214 20% 88%;
+    --ring: 193 76% 40%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(142 71% 60%));
+    --gradient-warning: linear-gradient(135deg, hsl(var(--warning)), hsl(45 93% 60%));
+    --gradient-critical: linear-gradient(135deg, hsl(var(--critical)), hsl(0 84% 70%));
+    
+    /* Chart colors */
+    --chart-1: 193 76% 40%;
+    --chart-2: 142 71% 45%;
+    --chart-3: 45 93% 47%;
+    --chart-4: 0 84% 60%;
+    --chart-5: 263 70% 60%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Dark theme */
+    --background: 220 27% 8%;
+    --foreground: 218 23% 95%;
+
+    --card: 220 27% 10%;
+    --card-foreground: 218 23% 95%;
+
+    --popover: 220 27% 10%;
+    --popover-foreground: 218 23% 95%;
+
+    --primary: 193 76% 55%;
+    --primary-foreground: 220 27% 8%;
+    --primary-light: 193 76% 25%;
+    --primary-glow: 193 76% 70%;
+
+    --secondary: 220 20% 15%;
+    --secondary-foreground: 218 23% 85%;
+
+    --muted: 220 20% 15%;
+    --muted-foreground: 218 11% 65%;
+
+    --accent: 220 20% 15%;
+    --accent-foreground: 218 23% 85%;
+
+    /* Dark theme status colors */
+    --success: 142 71% 50%;
+    --success-foreground: 220 27% 8%;
+    --success-light: 142 71% 15%;
+    
+    --warning: 45 93% 55%;
+    --warning-foreground: 220 27% 8%;
+    --warning-light: 45 93% 15%;
+    
+    --critical: 0 84% 65%;
+    --critical-foreground: 220 27% 8%;
+    --critical-light: 0 84% 15%;
+
+    --destructive: 0 84% 65%;
+    --destructive-foreground: 220 27% 8%;
+
+    --border: 220 20% 18%;
+    --input: 220 20% 18%;
+    --ring: 193 76% 55%;
+
+    /* Dark gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(142 71% 65%));
+    --gradient-warning: linear-gradient(135deg, hsl(var(--warning)), hsl(45 93% 70%));
+    --gradient-critical: linear-gradient(135deg, hsl(var(--critical)), hsl(0 84% 80%));
+    
+    /* Dark chart colors */
+    --chart-1: 193 76% 55%;
+    --chart-2: 142 71% 50%;
+    --chart-3: 45 93% 55%;
+    --chart-4: 0 84% 65%;
+    --chart-5: 263 70% 70%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}

@@ -1,0 +1,6 @@
+name,category,current_stock,reorder_point,unit_cost,selling_price,supplier,location
+Gaming Keyboard Mechanical,Electronics,25,10,45.00,89.99,TechCorp,Warehouse A
+Bamboo Cutting Board,Kitchen,18,5,15.00,29.99,KitchenSupplies,Storage B
+Running Shoes Premium,Sports,12,8,35.00,79.99,SportGear,Warehouse C
+Essential Oil Lavender,Beauty,30,15,8.00,19.99,BeautySupplies,Storage A
+Wireless Mouse,Electronics,22,12,20.00,39.99,TechCorp,Warehouse A
