@@ -164,14 +164,14 @@ export function InventoryGrid({ className }: InventoryGridProps) {
   // Filter items based on search term, status, and category
   const filteredItems = useMemo(() => {
     return MOCK_INVENTORY.filter(item => {
-      const matchesSearch = searchTerm === "" || 
+      const matchesSearch = searchTerm === "" ||
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.category.toLowerCase().includes(searchTerm.toLowerCase());
-      
+
       const matchesStatus = statusFilter === "all" || item.status.level === statusFilter;
-      
+
       const matchesCategory = categoryFilter === "all" || item.category === categoryFilter;
-      
+
       return matchesSearch && matchesStatus && matchesCategory;
     });
   }, [searchTerm, statusFilter, categoryFilter]);
