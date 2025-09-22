@@ -255,7 +255,8 @@ if os.path.exists(sample_file):
             "SKU002": 50,
             "SKU003": 120,
             "SKU004": 80,
-            "SKU005": 60
+            "SKU005": 60,
+            "SKU006": 60
         }
         print("Preloaded current stock for SKUs")
         
