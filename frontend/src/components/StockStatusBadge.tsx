@@ -1,10 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export interface StockStatus {
-  level: "safe" | "low" | "critical";
-  quantity: number;
-  threshold?: number;
-}
+export type StockStatus = "safe" | "low" | "critical";
 
 interface StockStatusBadgeProps {
   status: StockStatus;
@@ -12,7 +8,7 @@ interface StockStatusBadgeProps {
 }
 
 export function StockStatusBadge({ status, className }: StockStatusBadgeProps) {
-  const getStatusConfig = (level: StockStatus["level"]) => {
+  const getStatusConfig = (level: StockStatus) => {
     switch (level) {
       case "safe":
         return {
@@ -35,21 +31,17 @@ export function StockStatusBadge({ status, className }: StockStatusBadgeProps) {
     }
   };
 
-  const config = getStatusConfig(status.level);
+  const config = getStatusConfig(status);
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <span
-        className={cn(
-          "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
-          config.className
-        )}
-      >
-        {config.label}
-      </span>
-      <span className="text-sm text-muted-foreground">
-        {status.quantity} units
-      </span>
-    </div>
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+        config.className,
+        className
+      )}
+    >
+      {config.label}
+    </span>
   );
 }

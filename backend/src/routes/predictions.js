@@ -261,13 +261,36 @@ router.get('/chart/:id', (req, res) => {
       const salesVelocity = predRow.sales_velocity || 0;
       const reorderPoint = predRow.reorder_point;
 
-      // Historical data
+      // Historical data - build sales map
       const salesMap = {};
       salesRows.forEach(row => {
         salesMap[row.date] = row.daily_sales;
       });
 
-      // Generate data points for the last 30 days and next 30 days
+      // Calculate running stock levels going backwards from current stock
+      let runningStock = currentStock;
+      const historicalStockMap = {};
+
+      // Calculate historical stock levels
+      for (let i = 0; i >= -parseInt(days); i--) {
+        const date = new Date();
+        date.setDate(date.getDate() + i);
+        const dateStr = date.toISOString().split('T')[0];
+
+        if (i === 0) {
+          historicalStockMap[dateStr] = currentStock;
+        } else {
+          // Go backwards - add back sales that would have happened
+          const nextDate = new Date();
+          nextDate.setDate(nextDate.getDate() + i + 1);
+          const nextDateStr = nextDate.toISOString().split('T')[0];
+          const salesOnNextDay = salesMap[nextDateStr] || 0;
+          runningStock += salesOnNextDay;
+          historicalStockMap[dateStr] = Math.max(0, runningStock);
+        }
+      }
+
+      // Generate data points for the chart
       for (let i = -parseInt(days); i <= parseInt(days); i++) {
         const date = new Date();
         date.setDate(date.getDate() + i);
@@ -278,7 +301,7 @@ router.get('/chart/:id', (req, res) => {
 
         if (i <= 0) {
           // Historical data
-          actual = currentStock + (salesMap[dateStr] || 0) * (parseInt(days) + i);
+          actual = historicalStockMap[dateStr] || 0;
           if (i === 0) predicted = currentStock;
         } else {
           // Future predictions

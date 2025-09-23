@@ -21,6 +21,16 @@ const Dashboard = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Fetch inventory items to get the first item for chart
+  const { data: inventoryItems } = useQuery({
+    queryKey: ['inventory-items'],
+    queryFn: () => inventoryService.getInventoryItems(),
+    staleTime: 60000,
+  });
+
+  // Get first available item for chart
+  const firstItem = inventoryItems?.[0];
+
   // Fetch inventory statistics
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['inventory-stats'],
@@ -245,7 +255,18 @@ const Dashboard = () => {
         {/* Charts and Upload */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           <div className="lg:col-span-2">
-            <InventoryChart />
+            {firstItem ? (
+              <InventoryChart
+                itemId={firstItem.id}
+                title={`Stock Levels & Predictions - ${firstItem.name}`}
+                description={`Historical data and forecasted inventory levels for ${firstItem.name}`}
+              />
+            ) : (
+              <InventoryChart
+                title="Stock Levels & Predictions"
+                description="Upload inventory data to see charts and predictions"
+              />
+            )}
           </div>
           <div>
             <InventoryUpload />

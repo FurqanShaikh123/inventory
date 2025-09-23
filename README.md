@@ -2,7 +2,52 @@
 
 A modern, full-stack inventory management application with AI-powered stock depletion predictions. Built with React TypeScript frontend and Node.js backend with SQLite database.
 
-## 🚀 Features
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+ and npm 9+
+- Git
+
+### Installation & Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/FurqanShaikh123/inventory.git
+   cd inventory
+   ```
+
+2. **Option A: Quick Development Setup**
+   ```bash
+   # Install all dependencies
+   npm run install:all
+
+   # Set up environment files
+   npm run setup:env
+
+   # Start both frontend and backend
+   npm run dev
+   ```
+
+3. **Option B: Manual Setup**
+   ```bash
+   # Backend setup
+   cd backend
+   npm install
+   cp .env.example .env
+   npm start &
+
+   # Frontend setup (in new terminal)
+   cd ../frontend
+   npm install
+   npm run dev
+   ```
+
+4. **Access the application:**
+   - Frontend: http://localhost:8080
+   - Backend API: http://localhost:3001/api
+   - Health Check: http://localhost:3001/health
+
+## 🎯 Features
 
 ### ✅ Completed Features
 - **Real-time Inventory Management**: Add, update, delete, and track inventory items
@@ -172,6 +217,73 @@ curl -X POST http://localhost:3001/api/predictions/generate
 - [ ] Advanced analytics and reporting
 - [ ] User authentication and roles
 - [ ] Audit trail and version history
+
+## 🚢 Production Deployment
+
+### Option 1: Automated Deployment Script
+```bash
+# Build and deploy both frontend and backend
+./deploy.sh
+```
+
+This script will:
+- Build the frontend with optimizations
+- Prepare the backend for production
+- Create a deployment package
+- Provide a ready-to-run production build
+
+### Option 2: Docker Deployment
+```bash
+# Build and run with Docker
+docker build -t inventory-app .
+docker run -p 3001:3001 inventory-app
+
+# Or use Docker Compose
+docker-compose up -d
+```
+
+### Option 3: Manual Production Build
+```bash
+# Build frontend
+cd frontend && npm run build
+
+# The production build will be in frontend/dist/
+# Configure your web server to serve these files
+# and proxy API requests to the backend
+```
+
+### Environment Variables for Production
+```env
+# Backend (.env)
+NODE_ENV=production
+PORT=3001
+DATABASE_PATH=./data/inventory.db
+FRONTEND_URL=https://your-domain.com
+
+# Frontend (.env)
+VITE_API_URL=https://your-api-domain.com/api
+```
+
+## 🔧 Available Scripts
+
+### Root Level Scripts
+- `npm run dev` - Start both frontend and backend in development
+- `npm run build` - Build both frontend and backend for production
+- `npm run start` - Start both in production mode
+- `npm run install:all` - Install dependencies for all projects
+- `npm run clean` - Clean all node_modules and database
+- `npm run setup` - Complete setup including environment files
+
+### Frontend Scripts
+- `npm run dev` - Start development server (Vite)
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+
+### Backend Scripts
+- `npm run dev` - Start with nodemon (auto-restart)
+- `npm start` - Start production server
+- `npm test` - Run tests
 
 ## 🤝 Contributing
 1. Fork the repository

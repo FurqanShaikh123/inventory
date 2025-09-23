@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Upload, FileText, CheckCircle, AlertCircle } from "lucide-react";
+import { Upload, FileText, CheckCircle, AlertCircle, X } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,8 @@ export function InventoryUpload({
   className
 }: InventoryUploadProps) {
   const [isDragOver, setIsDragOver] = useState(false);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadComplete, setUploadComplete] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -28,23 +29,32 @@ export function InventoryUpload({
         : uploadService.uploadInventoryData(file);
     },
     onSuccess: (data) => {
+      setUploadComplete(true);
       toast({
         title: "Upload successful!",
-        description: `Processed ${data.recordsProcessed} records successfully.`,
+        description: `Processed ${data.recordsProcessed} records successfully. Data will be reflected in real-time.`,
       });
 
       // Invalidate all related queries to refresh the dashboard
       queryClient.invalidateQueries({ queryKey: ['inventory'] });
       queryClient.invalidateQueries({ queryKey: ['inventory-stats'] });
       queryClient.invalidateQueries({ queryKey: ['low-stock-alerts'] });
+      queryClient.invalidateQueries({ queryKey: ['inventory-items'] });
 
-      if (uploadType === 'sales') {
+      // Always invalidate chart data and predictions for both upload types
+      queryClient.invalidateQueries({ queryKey: ['predictions'] });
+      queryClient.invalidateQueries({ queryKey: ['chart-data'] });
+
+      // For inventory uploads, also refresh predictions since stock levels changed
+      if (uploadType === 'inventory') {
         queryClient.invalidateQueries({ queryKey: ['predictions'] });
-        queryClient.invalidateQueries({ queryKey: ['chart-data'] });
       }
 
-      // Also invalidate inventory data that other components use
-      queryClient.invalidateQueries({ queryKey: ['inventory-items'] });
+      // Force a complete data refresh after upload
+      setTimeout(() => {
+        // Refetch all queries instead of full page reload
+        queryClient.refetchQueries();
+      }, 500);
     },
     onError: (error: Error) => {
       toast({
@@ -52,7 +62,6 @@ export function InventoryUpload({
         description: error.message,
         variant: "destructive",
       });
-      setUploadedFile(null);
     },
   });
 
@@ -73,9 +82,9 @@ export function InventoryUpload({
     const files = Array.from(e.dataTransfer.files);
     const file = files[0];
 
-    if (file && (file.type === "text/csv" || file.type === "application/json" || file.name.endsWith('.csv') || file.name.endsWith('.json'))) {
-      setUploadedFile(file);
-      uploadMutation.mutate(file);
+    if (file && (file.type === 'text/csv' || file.type === 'application/json' || file.name.endsWith('.csv') || file.name.endsWith('.json'))) {
+      setSelectedFile(file);
+      setUploadComplete(false);
     } else {
       toast({
         title: "Invalid file type",
@@ -88,9 +97,23 @@ export function InventoryUpload({
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setUploadedFile(file);
-      uploadMutation.mutate(file);
+      setSelectedFile(file);
+      setUploadComplete(false);
     }
+  };
+
+  const handleUpload = () => {
+    if (selectedFile) {
+      uploadMutation.mutate(selectedFile);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    setUploadComplete(false);
+    uploadMutation.reset();
+    const input = document.getElementById('file-input') as HTMLInputElement;
+    if (input) input.value = '';
   };
 
   const getTitle = () => {
@@ -103,6 +126,22 @@ export function InventoryUpload({
       : 'Upload your current inventory data in CSV or JSON format to update stock levels';
   };
 
+  const getSampleFormat = () => {
+    if (uploadType === 'sales') {
+      return {
+        title: "Sales Data Format (CSV):",
+        example: "product_id,product_name,quantity_sold,sale_date,unit_price\n001,Wireless Headphones,5,2024-01-15,99.99"
+      };
+    } else {
+      return {
+        title: "Inventory Data Format (CSV):",
+        example: "name,category,currentStock,reorderPoint,unitCost,sellingPrice,supplier,location\nWireless Headphones,Electronics,45,20,75.00,149.99,TechCorp,Warehouse A"
+      };
+    }
+  };
+
+  const sampleFormat = getSampleFormat();
+
   return (
     <Card className={cn("w-full", className)}>
       <CardHeader>
@@ -111,15 +150,16 @@ export function InventoryUpload({
           {getDescription()}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        {/* File Upload Area */}
         <div
           className={cn(
             "border-2 border-dashed rounded-lg p-8 text-center transition-colors",
             isDragOver
-              ? "border-primary bg-primary-light"
+              ? "border-primary bg-primary/5"
               : "border-border hover:border-primary/50",
-            uploadedFile && !uploadMutation.isPending && "border-success bg-success-light",
-            uploadMutation.isError && "border-critical bg-critical-light"
+            selectedFile && !uploadMutation.isPending && "border-success bg-success/5",
+            uploadMutation.isError && "border-destructive bg-destructive/5"
           )}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -133,43 +173,60 @@ export function InventoryUpload({
                 <p className="text-sm text-muted-foreground mt-1">Processing your file</p>
               </div>
             </div>
-          ) : uploadedFile && !uploadMutation.isError ? (
+          ) : uploadComplete ? (
             <div className="flex flex-col items-center gap-3">
               <CheckCircle className="h-12 w-12 text-success" />
               <div>
                 <p className="font-medium text-success">File uploaded successfully!</p>
-                <p className="text-sm text-muted-foreground mt-1">{uploadedFile.name}</p>
+                <p className="text-sm text-muted-foreground mt-1">{selectedFile?.name}</p>
+                <p className="text-xs text-muted-foreground mt-1">Data has been processed and will appear in real-time</p>
               </div>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => {
-                  setUploadedFile(null);
-                  const input = document.getElementById('file-input') as HTMLInputElement;
-                  if (input) input.value = '';
-                  uploadMutation.reset();
-                }}
+                onClick={handleRemoveFile}
               >
                 Upload Different File
               </Button>
             </div>
           ) : uploadMutation.isError ? (
             <div className="flex flex-col items-center gap-3">
-              <AlertCircle className="h-12 w-12 text-critical" />
+              <AlertCircle className="h-12 w-12 text-destructive" />
               <div>
-                <p className="font-medium text-critical">Upload failed</p>
+                <p className="font-medium text-destructive">Upload failed</p>
                 <p className="text-sm text-muted-foreground mt-1">Please try again</p>
               </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  setUploadedFile(null);
+                  setSelectedFile(null);
                   uploadMutation.reset();
                 }}
               >
                 Try Again
               </Button>
+            </div>
+          ) : selectedFile ? (
+            <div className="flex flex-col items-center gap-3">
+              <FileText className="h-12 w-12 text-primary" />
+              <div>
+                <p className="font-medium">File selected:</p>
+                <p className="text-sm text-muted-foreground">{selectedFile.name}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Size: {Math.round(selectedFile.size / 1024)} KB
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleUpload} size="sm">
+                  <Upload className="mr-2 h-4 w-4" />
+                  Upload Now
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleRemoveFile}>
+                  <X className="mr-2 h-4 w-4" />
+                  Remove
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-3">
@@ -196,6 +253,14 @@ export function InventoryUpload({
             onChange={handleFileInput}
             className="hidden"
           />
+        </div>
+
+        {/* Sample Format */}
+        <div className="bg-muted p-4 rounded-lg">
+          <h4 className="font-medium text-sm mb-2">{sampleFormat.title}</h4>
+          <code className="text-xs bg-background p-2 rounded block overflow-x-auto">
+            {sampleFormat.example}
+          </code>
         </div>
       </CardContent>
     </Card>

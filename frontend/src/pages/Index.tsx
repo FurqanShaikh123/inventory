@@ -12,10 +12,88 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import heroImage from "@/assets/hero-inventory.jpg";
 
 const Index = () => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // For demo purposes, just close the modal and redirect
+    setIsLoginOpen(false);
+    window.location.href = '/dashboard';
+  };
+
+  const AuthModal = () => (
+    <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{authMode === 'login' ? 'Welcome Back' : 'Create Account'}</DialogTitle>
+          <DialogDescription>
+            {authMode === 'login'
+              ? 'Sign in to your inventory management account'
+              : 'Create a new account to get started'
+            }
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleLogin} className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="m@example.com"
+              required
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              required
+            />
+          </div>
+          {authMode === 'signup' && (
+            <div className="grid gap-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                required
+              />
+            </div>
+          )}
+          <Button type="submit" className="w-full">
+            {authMode === 'login' ? 'Sign In' : 'Create Account'}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="w-full"
+            onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}
+          >
+            {authMode === 'login'
+              ? "Don't have an account? Sign up"
+              : "Already have an account? Sign in"
+            }
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -31,8 +109,8 @@ const Index = () => {
               <Button variant="ghost" asChild>
                 <Link to="/dashboard">Dashboard</Link>
               </Button>
-              <Button asChild>
-                <Link to="/dashboard">Get Started</Link>
+              <Button onClick={() => setIsLoginOpen(true)}>
+                Get Started
               </Button>
             </div>
           </div>
@@ -66,15 +144,17 @@ const Index = () => {
                   onMouseEnter={() => setIsHovered(true)}
                   onMouseLeave={() => setIsHovered(false)}
                 >
-                  <Link to="/dashboard">
+                  <Link to="/dashboard?mode=demo">
                     Try Demo Dashboard
                     <ArrowRight className={`ml-2 h-5 w-5 transition-transform ${isHovered ? 'translate-x-1' : ''}`} />
                   </Link>
                 </Button>
-                <Button variant="outline" size="lg" asChild>
-                  <Link to="/dashboard">
-                    Watch Demo
-                  </Link>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setIsLoginOpen(true)}
+                >
+                  Watch Demo
                 </Button>
               </div>
 
@@ -289,12 +369,17 @@ const Index = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>
-              <Link to="/dashboard">
+              <Link to="/dashboard?mode=demo">
                 Try Live Demo
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+              onClick={() => setIsLoginOpen(true)}
+            >
               Schedule Demo Call
             </Button>
           </div>
@@ -315,6 +400,9 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* Authentication Modal */}
+      <AuthModal />
     </div>
   );
 };
