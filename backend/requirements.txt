@@ -1,0 +1,10 @@
+flask
+pandas
+numpy
+python-dotenv
+pymongo
+statsmodels
+pytz
+scikit-learn
+requests
+google-genai
